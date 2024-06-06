@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="CollectionLibrary">
+      <HintPath>..\..\CollectionLibrary\CollectionLibrary\bin\Debug\net8.0\CollectionLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="CustomLibrary">
+      <HintPath>..\..\CollectionLibrary\CollectionLibrary\bin\Debug\net8.0\CustomLibrary.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
