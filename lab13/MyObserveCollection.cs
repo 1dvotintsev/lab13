@@ -8,38 +8,72 @@ using CollectionLibrary;
 using CustomLibrary;
 using System.ComponentModel;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Xml.Linq;
 
 namespace lab13
 {
-    public delegate void CollectionHandler(object source, CollectionEventArgs args);
+    public delegate void CollectionHandler(object source, CollectionHandlerEventArgs args);
     public class MyObserveCollection<T>: MyCollection<T> where T : IInit, ICloneable, IComparable, new()
     {
         public event CollectionHandler CollectionCountChanged;
 
-        public event CollectionHandler CollectionCountMinus;
+        public event CollectionHandler CollectionReferenceChanged;
+
+        private List<T> list = new List<T>();
 
         public MyObserveCollection(int length):base(length) 
         {
             ToSearchTree(this);
+            SyncElements();
         }
 
-        public void OnAddItem(object source, CollectionEventArgs args)
+        public T this[int index]
+        {
+            get
+            {
+                if (index < 0 || index >= list.Count)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(index));
+                }
+                return list[index];
+            }
+            set
+            {
+                if (index < 0 || index >= list.Count)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(index));
+                }
+                T oldValue = list[index];
+                list[index] = value;
+
+                // Обновляем дерево, заменяя старое значение на новое
+                ReplaceInTree(oldValue, value);
+
+                OnReferenceChanged(this, new CollectionHandlerEventArgs("изменение по индексу", value.ToString()));
+            }
+        }
+
+        public void OnCountChanged(object source, CollectionHandlerEventArgs args)
         {
             CollectionCountChanged?.Invoke(this, args);
         }
 
-        public void OnDeleteItem(object source, CollectionEventArgs args)
+        public void OnReferenceChanged(object source, CollectionHandlerEventArgs args)
         {
-            CollectionCountMinus?.Invoke(this, args);
+            CollectionReferenceChanged?.Invoke(this, args);
         }
 
-        public new void Add(T item)
+        public new void Add(T item, bool ok = true)
         {
             base.Add(item);
-            OnAddItem(this, new CollectionEventArgs(Id));
+            SyncElements();
+            if(ok)
+            {
+                OnCountChanged(this, new CollectionHandlerEventArgs("добавление", item.ToString()));
+            }
         }
 
-        public new bool Remove(T data)
+        public new bool Remove(T data, bool ok = true)
         {
             Node<T>? parent = null;
             Node<T>? current = root;
@@ -62,7 +96,11 @@ namespace lab13
             if (current == null)
                 return false;
 
-            OnDeleteItem(this, new CollectionEventArgs(Id));
+            if (ok)
+            {
+                OnCountChanged(this, new CollectionHandlerEventArgs("удаление", current.Data.ToString()));
+            }
+            
 
             // Если у узла есть два потомка
             if (current.Left != null && current.Right != null)
@@ -97,8 +135,27 @@ namespace lab13
                 parent.Right = child;
 
             count--;
+            SyncElements();
             return true;
         }
 
+        private void SyncElements()
+        {
+            list.Clear();
+            foreach (var item in this)
+            {
+                list.Add(item);
+            }
+        }
+
+        private void ReplaceInTree(T oldValue, T newValue)
+        {
+            // Удаляем старое значение
+            Remove(oldValue, false);
+            // Добавляем новое значение
+            Add(newValue, false);
+            // Синхронизируем элементы
+            //SyncElements();
+        }
     }
 }

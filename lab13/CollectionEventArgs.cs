@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 
 namespace lab13
 {
-    public class CollectionEventArgs : EventArgs
-    {
-        public string Id { get; set; }
+    public class CollectionHandlerEventArgs : EventArgs
+    {        
+        public string ChangeType { get; set; }
+        public string Obj {  get; set; }
 
-        public CollectionEventArgs(string id)
+        public CollectionHandlerEventArgs(string changeType, string obj)
         {
-            Id = id;
+            ChangeType = changeType;
+            Obj = obj;
         }
     }
 }

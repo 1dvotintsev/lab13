@@ -8,7 +8,7 @@ namespace lab13
     {
         static void Main(string[] args)
         {
-            string menu = "Выберете одно из действий над коллекцией:\n\n1)Добавить случайный элемент\n2)Удалить элемент с заданным именем\n3)Пересоздать элемент с заданным именем\n4)Распечатать коллекцию\n5)Распечатать журнал изменений";
+            string menu = "Выберете одно из действий над коллекцией:\n\n1) Добавить случайный элемент\n2) Удалить элемент с заданным именем\n3) Пересоздать элемент по индексу\n4) Распечатать коллекцию\n5) Распечатать журнал изменений";
 
             int answer = 0;
             int current = 0;
@@ -27,13 +27,11 @@ namespace lab13
             Journal journal2 = new Journal();
             journals.Add(journal2);
 
-            collection1.CollectionCountChanged += journal1.WriteAdd;
-            collection1.CollectionCountMinus += journal1.WriteDelete;
-            collection1.CollectionReferenceChanged += journal1.WriteSet;
+            collection1.CollectionCountChanged += journal1.WriteRecord;
+            collection1.CollectionReferenceChanged += journal1.WriteRecord;
 
-            collection2.CollectionCountChanged += journal2.WriteAdd;
-            collection2.CollectionCountMinus += journal2.WriteDelete;
-            collection2.CollectionReferenceChanged += journal2.WriteSet;
+            collection2.CollectionCountChanged += journal2.WriteRecord;
+            collection2.CollectionReferenceChanged += journal2.WriteRecord;
 
             while (true)
             {
@@ -102,21 +100,22 @@ namespace lab13
 
                         Emoji emoji = new Emoji();
                         emoji.RandomInit();
-                        Console.WriteLine("Введите имя объекта для его пересоздания:");
-                        string name = Console.ReadLine();
-                        emoji.Name = name;
+                        Console.WriteLine("Введите индекс объекта для его пересоздания:");
+                        int index = ChooseAnswer(0, list[current].Count);
 
-                        Emoji temp = new Emoji();
-                        temp.RandomInit();
-
-                        if (list[current].Contains(emoji))
+                        bool correct = false;
+                        while (!correct)
                         {
-                            list[current].UpdateNodeData(list[current].Find(emoji), temp);
-                            Console.WriteLine("Данные изменены");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Такого объекта нет");
+                            try
+                            {
+                                list[current][index] = emoji;
+                                Console.WriteLine("Данные были изменены");
+                                correct = true;
+                            }
+                            catch
+                            {
+                                correct = false;
+                            }
                         }
 
                         break;

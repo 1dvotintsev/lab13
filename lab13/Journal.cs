@@ -5,26 +5,37 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using CollectionLibrary;
+using CustomLibrary;
 
 namespace lab13
 {
+    public class JournalEntry
+    {
+        public string Id { get; set; }
+        public string ChangeType { get; set; }
+        public string Item {  get; set; }
+
+        public JournalEntry(string id, string changetype, string item) 
+        { 
+            Id = id;
+            ChangeType = changetype;
+            Item = item;
+        }
+
+        public override string ToString()
+        {
+            return $"В коллекции {Id} произошло {ChangeType}, объект: {Item}";
+        }
+    }
+    
     public class Journal
     {
-        List<string> journal = new List<string>();
+        public List<JournalEntry> journal = new List<JournalEntry>();
 
-        public void WriteAdd(object source, CollectionEventArgs args)
+        public void WriteRecord(object source, CollectionHandlerEventArgs args) 
         {
-            journal.Add($"В коллекцию {args.Id} был добавлен узел");
-        }
-
-        public void WriteDelete(object source, CollectionEventArgs args)
-        {
-            journal.Add($"В коллекции {args.Id} был удален узел");
-        }
-
-        public void WriteSet(object source, NodeEventArgs args)
-        {
-            journal.Add($"В коллекции {args.Id} был изменен узел");
+            JournalEntry record = new JournalEntry(((MyObserveCollection<Emoji>)source).Id, args.ChangeType, args.Obj);
+            journal.Add(record);
         }
 
         public void PrintJournal()
