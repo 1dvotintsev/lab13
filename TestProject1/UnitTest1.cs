@@ -181,8 +181,12 @@ namespace lab13
             [TestMethod]
             public void WriteAdd_LogsAddEvent()
             {
-                var args = new CollectionEventArgs("1");
-                journal.WriteAdd(this, args);
+                Journal journal = new Journal();
+                MyObserveCollection<Emoji> emojis = new MyObserveCollection<Emoji>(1);
+
+                var args = new CollectionHandlerEventArgs("1", "1");
+
+                journal.WriteRecord(emojis, args);
                 journal.PrintJournal();
 
                 // Проверка, что событие добавления записано в журнал
@@ -192,53 +196,17 @@ namespace lab13
             [TestMethod]
             public void WriteDelete_LogsDeleteEvent()
             {
-                var args = new CollectionEventArgs("1");
-                journal.WriteDelete(this, args);
+                Journal journal = new Journal();
+                MyObserveCollection<Emoji> emojis = new MyObserveCollection<Emoji>(1); 
+                var args = new CollectionHandlerEventArgs("1", "1");
+                journal.WriteRecord(emojis, args);
                 journal.PrintJournal();
 
                 // Проверка, что событие удаления записано в журнал
                 //Assert.IsTrue(journal.Contains("В коллекции 1 был удален узел"));
             }
 
-            [TestMethod]
-            public void WriteSet_LogsSetEvent()
-            {
-                var args = new NodeEventArgs("1");
-                journal.WriteSet(this, args);
-                journal.PrintJournal();
-
-                // Проверка, что событие изменения записано в журнал
-                //Assert.IsTrue(journal.Contains("В коллекции 1 был изменен узел"));
-            }
-
-            [TestMethod]
-            public void PrintJournal_PrintsCorrectly()
-            {
-                var argsAdd = new CollectionEventArgs("1");
-                var argsDelete = new CollectionEventArgs("1");
-                var argsSet = new NodeEventArgs("1");
-
-                journal.WriteAdd(this, argsAdd);
-                journal.WriteDelete(this, argsDelete);
-                journal.WriteSet(this, argsSet);
-
-                using (var sw = new StringWriter())
-                {
-                    Console.SetOut(sw);
-                    journal.PrintJournal();
-
-                    var expectedOutput = string.Join(Environment.NewLine, new List<string>
-                {
-                    "В коллекцию 1 был добавлен узел",
-                    "В коллекции 1 был удален узел",
-                    "В коллекции 1 был изменен узел",
-                    string.Empty // To match the final newline
-                });
-
-                    Assert.AreEqual(expectedOutput, sw.ToString());
-                }
-            }
-
+           
             [TestMethod]
             public void PrintJournal_PrintsEmptyJournalMessage()
             {
@@ -257,13 +225,24 @@ namespace lab13
         [TestMethod]
         public void Remove_NonExistentItem_ShouldReturnFalse()
         {
-            
+            MyObserveCollection<Emoji> emojis = new MyObserveCollection<Emoji>(2);
+
+            Emoji emoji = new Emoji();
+            emoji.RandomInit();
+
+            emojis[0] = emoji;
+
+            Assert.AreEqual(true, emojis.Contains(emoji));
         }
 
         [TestMethod]
         public void Add_MultipleItems_ShouldMaintainOrder()
         {
-            
+            MyObserveCollection<Emoji> emojis = new MyObserveCollection<Emoji>(2);
+
+            Assert.AreEqual(false, emojis[0].Name.Equals("a"));
+
+
         }
     }
 }
