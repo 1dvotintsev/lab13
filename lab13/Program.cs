@@ -8,7 +8,7 @@ namespace lab13
     {
         static void Main(string[] args)
         {
-            string menu = "Выберете одно из действий над коллекцией:\n\n1) Добавить случайный элемент\n2) Удалить элемент с заданным именем\n3) Пересоздать элемент по индексу\n4) Распечатать коллекцию\n5) Распечатать журнал изменений";
+            string menu = "Выберете одно из действий над коллекцией:\n\n1) Добавить случайный элемент\n2) Удалить элемент с заданным именем\n3) Пересоздать элемент по индексу\n4) Распечатать коллекцию\n5) Распечатать журнал изменений (журнал коллекции 2 содержит изменения в коллекции 1)\n6) Вернуться к выброру коллекции";
 
             int answer = 0;
             int current = 0;
@@ -32,19 +32,29 @@ namespace lab13
 
             collection2.CollectionCountChanged += journal2.WriteRecord;
             collection2.CollectionReferenceChanged += journal2.WriteRecord;
+            collection1.CollectionCountChanged += journal2.WriteRecord;
+            collection1.CollectionReferenceChanged += journal2.WriteRecord;
 
-            while (true)
+            bool start = true;
+
+            while (start)
             {
 
                 Console.WriteLine("Данная програма демнстрирует работу событий в коллекции типа бинарного дерева. На данный момент добавлено 2 дерева. Вы можете осуществлять над ними действия и проверить их отображения в журнале изменений\n");
 
-                Console.WriteLine("Выберете над какой коллекцией вы хотите осуществлять действия:\n1) Коллекция 0\n2) Коллекция 1");
+                Console.WriteLine("Выберете над какой коллекцией вы хотите осуществлять действия:\n1) Коллекция 0\n2) Коллекция 1\n3) Завершить работу.");
 
-                current = ChooseAnswer(1, 2) - 1;
+                current = ChooseAnswer(1, 3) - 1;
+
+                if(current == 2)
+                {
+                    start = false;
+                    break;
+                }
 
                 Console.Clear();
                 Console.WriteLine(menu);
-                answer = ChooseAnswer(1, 5);
+                answer = ChooseAnswer(1, 6);
                 switch (answer)
                 {
                     case 1:
@@ -91,7 +101,7 @@ namespace lab13
                         }
                         catch
                         {
-                            
+                            Console.WriteLine("Вы ввели некорректные данные");
                         }
                         break;
 
@@ -100,15 +110,17 @@ namespace lab13
 
                         Emoji emoji = new Emoji();
                         emoji.RandomInit();
-                        Console.WriteLine("Введите индекс объекта для его пересоздания:");
-                        int index = ChooseAnswer(0, list[current].Count);
+                        Console.WriteLine("Введите имя объекта для его пересоздания:");
+                        emoji.Name = Console.ReadLine();
 
                         bool correct = false;
                         while (!correct)
                         {
                             try
                             {
-                                list[current][index] = emoji;
+                                Emoji newEmoji = new Emoji();
+                                newEmoji.RandomInit();
+                                list[current][emoji] = newEmoji;
                                 Console.WriteLine("Данные были изменены");
                                 correct = true;
                             }

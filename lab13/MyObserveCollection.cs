@@ -19,35 +19,30 @@ namespace lab13
 
         public event CollectionHandler CollectionReferenceChanged;
 
-        private List<T> list = new List<T>();
-
         public MyObserveCollection(int length):base(length) 
         {
             ToSearchTree(this);
-            SyncElements();
         }
 
-        public T this[int index]
+        public T this[T item]
         {
             get
             {
-                if (index < 0 || index >= list.Count)
+                if (Find(item) == null)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(index));
+                    throw new ArgumentOutOfRangeException(nameof(item));
                 }
-                return list[index];
+                return Find(item).Data;
             }
             set
             {
-                if (index < 0 || index >= list.Count)
+                if (Find(item) == null)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(index));
+                    throw new ArgumentOutOfRangeException(nameof(item));
                 }
-                T oldValue = list[index];
-                list[index] = value;
 
-                // Обновляем дерево, заменяя старое значение на новое
-                ReplaceInTree(oldValue, value);
+                Remove(item, false);
+                Add(value, false);
 
                 OnReferenceChanged(this, new CollectionHandlerEventArgs("изменение по индексу", value.ToString()));
             }
@@ -66,7 +61,7 @@ namespace lab13
         public new void Add(T item, bool ok = true)
         {
             base.Add(item);
-            SyncElements();
+
             if(ok)
             {
                 OnCountChanged(this, new CollectionHandlerEventArgs("добавление", item.ToString()));
@@ -135,27 +130,7 @@ namespace lab13
                 parent.Right = child;
 
             count--;
-            SyncElements();
             return true;
-        }
-
-        private void SyncElements()
-        {
-            list.Clear();
-            foreach (var item in this)
-            {
-                list.Add(item);
-            }
-        }
-
-        private void ReplaceInTree(T oldValue, T newValue)
-        {
-            // Удаляем старое значение
-            Remove(oldValue, false);
-            // Добавляем новое значение
-            Add(newValue, false);
-            // Синхронизируем элементы
-            //SyncElements();
         }
     }
 }

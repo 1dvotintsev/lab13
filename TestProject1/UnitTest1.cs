@@ -229,20 +229,70 @@ namespace lab13
 
             Emoji emoji = new Emoji();
             emoji.RandomInit();
+            emoji.Name = "a";
+            emojis.Add(emoji);
 
-            emojis[0] = emoji;
+            Emoji emoji2 = new Emoji();
+            emoji2.RandomInit(); 
+            emoji2.Name = "b";
 
-            Assert.AreEqual(true, emojis.Contains(emoji));
+            emojis[emoji] = emoji2;
+
+            Assert.AreEqual(true, emojis.Contains(emoji2));
         }
 
         [TestMethod]
         public void Add_MultipleItems_ShouldMaintainOrder()
         {
-            MyObserveCollection<Emoji> emojis = new MyObserveCollection<Emoji>(2);
+            MyObserveCollection<Emoji> emojis = new MyObserveCollection<Emoji>(1);
 
-            Assert.AreEqual(false, emojis[0].Name.Equals("a"));
+            Emoji em = new Emoji();
+            em.RandomInit();
+            em.Name = "ab";
 
+            emojis.Add(em);
 
+            Assert.AreEqual(true, emojis[em].Name.Equals("ab"));
+        }
+
+        [TestMethod]
+        public void Add_MultipleItems_ShouldMaintainOrde()
+        {
+            MyObserveCollection<Emoji> emojis = new MyObserveCollection<Emoji>(1);
+
+            Emoji em = new Emoji();
+            em.RandomInit();
+            em.Name = "ab";
+
+            //emojis.Add(em);
+
+            try
+            {
+                emojis[em] = em;
+            }
+            catch (Exception ex) { }
+
+            Assert.AreEqual(false, emojis.Contains(em));
+        }
+
+        [TestMethod]
+        public void Add_MultipleItems_ShouldMaintainOrd()
+        {
+            MyObserveCollection<Emoji> emojis = new MyObserveCollection<Emoji>(1);
+
+            Emoji em = new Emoji();
+            em.RandomInit();
+            //em.Name = "ab";
+
+            //emojis.Add(em);
+
+            try
+            {
+                em.Name = emojis[em].Name;
+            }
+            catch (Exception ex) { }
+
+            Assert.AreEqual(false, emojis.Contains(em));
         }
     }
 }
